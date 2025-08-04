@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metalcowrobotics 2025 FRC Scouting App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0F172A; /* Slate 900 */
+        }
+        /* Custom styles for a more polished look */
+        .form-input {
+            @apply block w-full px-5 py-3 mt-2 text-white bg-slate-700 border border-slate-600 rounded-xl shadow-inner focus:border-green-400 focus:ring-green-400 focus:ring-2 transition-all duration-300 placeholder-gray-400;
+        }
+        .btn {
+            @apply px-14 py-5 leading-6 text-gray-900 font-extrabold text-lg transition-all duration-300 transform bg-green-500 rounded-full hover:bg-green-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-400 shadow-xl hover:shadow-green-500/50 hover:-translate-y-1;
+        }
+        .btn-toggle {
+            @apply px-6 py-3 leading-5 text-green-400 font-semibold transition-all duration-300 transform bg-slate-700 rounded-full hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-400 shadow-md;
+        }
+        .modal {
+            @apply fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75 z-50 transition-opacity duration-300 ease-in-out;
+        }
+        .modal-content {
+            @apply bg-gray-800 p-8 rounded-3xl shadow-2xl max-w-lg w-full transform transition-all duration-300 ease-in-out scale-95;
+        }
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 2.5rem;
+            overflow: hidden; /* Ensures rounded corners on the table */
+        }
+        table thead th {
+            border-bottom-width: 2px;
+            border-color: #334155; /* Slate 700 */
+        }
+        table tbody tr:hover {
+            background-color: #374151; /* Gray 700 */
+        }
+        .message-box-enter {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+        .message-box-enter-active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .message-box-exit {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .message-box-exit-active {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 flex items-center justify-center min-h-screen p-6">
+
+    <div class="bg-slate-800 rounded-[3rem] shadow-2xl shadow-green-500/20 p-8 sm:p-12 max-w-7xl w-full border border-slate-700">
+
+        <header class="text-center mb-12">
+            <h1 class="text-5xl sm:text-6xl font-extrabold text-white mb-2 tracking-wide drop-shadow-md">Metalcowrobotics</h1>
+            <h2 class="text-2xl sm:text-3xl font-bold text-green-400 drop-shadow-lg">2025 FRC REEFSCAPE Scouting App</h2>
+            <p class="text-md text-gray-400 mt-3">Team 4213 | Scouting for success!</p>
+        </header>
+
+        <div id="message-box" class="hidden fixed top-8 left-1/2 -translate-x-1/2 p-4 rounded-lg shadow-xl z-50 text-white font-bold transition-all duration-300 ease-in-out transform"></div>
+
+        <div class="mb-14">
+            <h3 class="text-3xl font-bold text-white mb-8 border-b-4 border-green-500 pb-3">Match Scouting Form</h3>
+            <form id="scouting-form" class="space-y-12">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div>
+                        <label for="scout-name" class="block text-gray-200 font-bold">Scout Name</label>
+                        <input type="text" id="scout-name" class="form-input" required placeholder="Your Name">
+                    </div>
+                    <div>
+                        <label for="match-number" class="block text-gray-200 font-bold">Match Number</label>
+                        <input type="number" id="match-number" class="form-input" required min="1" placeholder="e.g., 10">
+                    </div>
+                    <div>
+                        <label for="team-number" class="block text-gray-200 font-bold">Team Number</label>
+                        <input type="number" id="team-number" class="form-input" required min="1" placeholder="e.g., 4213">
+                    </div>
+                    <div>
+                        <label for="alliance-color" class="block text-gray-200 font-bold">Alliance Color</label>
+                        <select id="alliance-color" class="form-input" required>
+                            <option value="" disabled selected>Select Alliance</option>
+                            <option value="Red">Red</option>
+                            <option value="Blue">Blue</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="p-8 bg-slate-700 rounded-[2.5rem] border border-slate-600 shadow-2xl">
+                    <h4 class="text-2xl font-bold text-white mb-6">Autonomous Period</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div>
+                            <label for="auto-coral" class="block text-gray-200 font-medium">Scored at Coral Station</label>
+                            <input type="number" id="auto-coral" class="form-input" value="0" min="0">
+                        </div>
+                        <div>
+                            <label for="auto-barge" class="block text-gray-200 font-medium">Scored at Barge</label>
+                            <input type="number" id="auto-barge" class="form-input" value="0" min="0">
+                        </div>
+                        <div class="flex items-end space-x-3 pb-2">
+                            <input type="checkbox" id="auto-mobility" class="h-8 w-8 text-green-500 bg-slate-800 border-slate-600 rounded-lg focus:ring-green-400">
+                            <label for="auto-mobility" class="text-gray-200 font-bold text-lg">Left Alliance Station (Mobility)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-8 bg-slate-700 rounded-[2.5rem] border border-slate-600 shadow-2xl">
+                    <h4 class="text-2xl font-bold text-white mb-6">Tele-op Period</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+                        <div>
+                            <label for="teleop-coral" class="block text-gray-200 font-medium">Scored at Coral Station</label>
+                            <input type="number" id="teleop-coral" class="form-input" value="0" min="0">
+                        </div>
+                        <div>
+                            <label for="teleop-processor" class="block text-gray-200 font-medium">Scored at Processor</label>
+                            <input type="number" id="teleop-processor" class="form-input" value="0" min="0">
+                        </div>
+                        <div>
+                            <label for="teleop-reef" class="block text-gray-200 font-medium">Scored at Reef</label>
+                            <input type="number" id="teleop-reef" class="form-input" value="0" min="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-8 bg-slate-700 rounded-[2.5rem] border border-slate-600 shadow-2xl">
+                    <h4 class="text-2xl font-bold text-white mb-6">Endgame & Notes</h4>
+                    <div class="space-y-8">
+                        <div>
+                            <label for="endgame-action" class="block text-gray-200 font-medium">Endgame Action</label>
+                            <select id="endgame-action" class="form-input" required>
+                                <option value="" disabled selected>Select Action</option>
+                                <option value="None">None</option>
+                                <option value="Park">Park</option>
+                                <option value="Climb">Climb</option>
+                                <option value="Climb with Alliance">Climb with Alliance</option>
+                                <option value="Trap">Trap</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="defense" class="block text-gray-200 font-medium">Defense Rating</label>
+                            <select id="defense" class="form-input" required>
+                                <option value="" disabled selected>Select Rating</option>
+                                <option value="Very Effective">Very Effective</option>
+                                <option value="Effective">Effective</option>
+                                <option value="Ineffective">Ineffective</option>
+                                <option value="None">None</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="comments" class="block text-gray-200 font-medium">Comments</label>
+                            <textarea id="comments" rows="3" class="form-input resize-none" placeholder="Notes on robot performance, issues, etc."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center pt-4">
+                    <button type="submit" class="btn">Submit Scouting Data</button>
+                </div>
+            </form>
+        </div>
+        
+        <div>
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-8">
+                <h3 class="text-3xl font-bold text-white mb-4 sm:mb-0">Scouting Data</h3>
+                <div class="flex flex-wrap justify-center items-center space-x-4 space-y-2 sm:space-y-0">
+                    <span class="text-sm text-gray-400">User ID: <span id="user-id" class="font-mono text-gray-300">Loading...</span></span>
+                    <button id="toggle-view-btn" class="btn-toggle">Analyze Data</button>
+                </div>
+            </div>
+            
+            <div id="raw-data-view" class="overflow-x-auto rounded-[2.5rem] shadow-xl border border-slate-700">
+                <table class="min-w-full divide-y divide-gray-700">
+                    <thead class="bg-slate-700">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Match #</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Team #</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Alliance</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Scout</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Auto Score</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Teleop Score</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Endgame</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Defense</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-table-body" class="bg-slate-800 divide-y divide-gray-700">
+                        <tr>
+                            <td colspan="8" class="px-6 py-4 text-center text-sm text-gray-400">No data submitted yet.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="analysis-view" class="hidden rounded-[2.5rem] shadow-xl border border-slate-700">
+                <table class="min-w-full divide-y divide-gray-700">
+                    <thead class="bg-slate-700">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Team #</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Matches Scouted</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Avg. Auto Points</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Avg. Teleop Points</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Endgame Success %</th>
+                        </tr>
+                    </thead>
+                    <tbody id="analysis-table-body" class="bg-slate-800 divide-y divide-gray-700">
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-400">No data available for analysis.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        // Your existing JavaScript code...
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Configuration and Initialization
+        let db;
+        let auth;
+        let userId = 'anonymous';
+        let allScoutingData = []; // Store all data for analysis
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        
+        // Define points for scoring elements
+        const POINTS = {
+            auto: {
+                coral: 5,
+                barge: 3,
+                mobility: 2
+            },
+            teleop: {
+                coral: 2,
+                processor: 3,
+                reef: 5
+            },
+            endgame: {
+                park: 3,
+                climb: 8,
+                climbWithAlliance: 10,
+                trap: 5
+            }
+        };
+
+        // Function to show a temporary message
+        function showMessage(text, type = 'success') {
+            const messageBox = document.getElementById('message-box');
+            messageBox.textContent = text;
+            messageBox.className = `fixed top-8 left-1/2 -translate-x-1/2 p-4 rounded-lg shadow-xl z-50 text-white font-bold transition-all duration-300 ease-in-out transform`;
+            
+            if (type === 'success') {
+                messageBox.classList.add('bg-green-500', 'translate-y-0', 'opacity-100');
+            } else if (type === 'error') {
+                messageBox.classList.add('bg-red-500', 'translate-y-0', 'opacity-100');
+            }
+
+            setTimeout(() => {
+                messageBox.classList.remove('translate-y-0', 'opacity-100');
+                messageBox.classList.add('translate-y-[-100%]', 'opacity-0');
+            }, 3000);
+        }
+
+        // Initialize Firebase and Authentication
+        async function initializeFirebase() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                // Await authentication before proceeding with Firestore operations
+                let user;
+                if (typeof __initial_auth_token !== 'undefined') {
+                    const userCredential = await signInWithCustomToken(auth, __initial_auth_token);
+                    user = userCredential.user;
+                } else {
+                    const userCredential = await signInAnonymously(auth);
+                    user = userCredential.user;
+                }
+
+                if (user) {
+                    userId = user.uid;
+                    document.getElementById('user-id').textContent = userId;
+                    console.log("User authenticated with UID:", userId);
+                    setupRealtimeListener();
+                } else {
+                    console.error("Authentication failed. No user object returned.");
+                    document.getElementById('user-id').textContent = 'Auth Failed';
+                    showMessage("Authentication failed. Cannot load data.", 'error');
+                }
+
+            } catch (error) {
+                console.error("Error initializing Firebase:", error);
+                showMessage("Failed to initialize app. Check the console for details.", 'error');
+            }
+        }
+
+        // Setup Firestore realtime listener for the scouting data
+        function setupRealtimeListener() {
+            // Path for public collaborative data
+            const scoutingCollectionPath = `artifacts/${appId}/public/data/reefscape-scouting`;
+            const scoutingQuery = query(collection(db, scoutingCollectionPath));
+
+            onSnapshot(scoutingQuery, (querySnapshot) => {
+                allScoutingData = [];
+                querySnapshot.forEach((doc) => {
+                    allScoutingData.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Sort by match number
+                allScoutingData.sort((a, b) => a.matchNumber - b.matchNumber);
+
+                displayRawData(allScoutingData);
+            }, (error) => {
+                console.error("Error fetching real-time data:", error);
+                showMessage("Failed to load data. Check console.", 'error');
+            });
+        }
+
+        // Display the fetched raw data in the table
+        function displayRawData(data) {
+            const tableBody = document.getElementById('data-table-body');
+            tableBody.innerHTML = ''; // Clear existing data
+
+            if (data.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="8" class="px-6 py-4 text-center text-sm text-gray-400">No data submitted yet.</td></tr>`;
+                return;
+            }
+
+            data.forEach((entry, index) => {
+                const autoScore = `Coral: ${entry.autoScoring.coral}, Barge: ${entry.autoScoring.barge}, Mobility: ${entry.autoScoring.mobility ? 'Yes' : 'No'}`;
+                const teleopScore = `Coral: ${entry.teleopScoring.coral}, Processor: ${entry.teleopScoring.processor}, Reef: ${entry.teleopScoring.reef}`;
+                const row = document.createElement('tr');
+                row.className = index % 2 === 0 ? 'bg-slate-800 transition-colors duration-150' : 'bg-slate-700 transition-colors duration-150';
+                row.innerHTML = `
+                    <td class="px-6 py-4 text-sm font-medium text-white">${entry.matchNumber}</td>
+                    <td class="px-6 py-4 text-sm text-gray-300">${entry.teamNumber}</td>
+                    <td class="px-6 py-4 text-sm text-gray-300">${entry.allianceColor}</td>
+                    <td class="px-6 py-4 text-sm text-gray-300">${entry.scoutName}</td>
+                    <td class="px-6 py-4 text-sm text-gray-300">${autoScore}</td>
+                    <td class="px-6 py-4 text-sm text-gray-300">${teleopScore}</td>
+                    <td class="px-6 py-4 text-sm text-gray-300">${entry.endgame}</td>
+                    <td class="px-6 py-4 text-sm text-gray-300">${entry.defense || 'N/A'}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Function to perform and display analysis
+        function runAnalysis(data) {
+            const analysisTableBody = document.getElementById('analysis-table-body');
+            analysisTableBody.innerHTML = ''; // Clear existing data
+
+            if (data.length === 0) {
+                analysisTableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-sm text-gray-400">No data available for analysis.</td></tr>`;
+                return;
+            }
+
+            // Group data by team number
+            const teams = data.reduce((acc, entry) => {
+                if (!acc[entry.teamNumber]) {
+                    acc[entry.teamNumber] = {
+                        matchCount: 0,
+                        totalAutoPoints: 0,
+                        totalTeleopPoints: 0,
+                        endgameAttempts: 0,
+                        endgameSuccesses: 0,
+                    };
+                }
+
+                // Calculate auto points
+                const autoPoints = (entry.autoScoring.coral * POINTS.auto.coral) +
+                                   (entry.autoScoring.barge * POINTS.auto.barge) +
+                                   (entry.autoScoring.mobility ? POINTS.auto.mobility : 0);
+                
+                // Calculate teleop points
+                const teleopPoints = (entry.teleopScoring.coral * POINTS.teleop.coral) +
+                                     (entry.teleopScoring.processor * POINTS.teleop.processor) +
+                                     (entry.teleopScoring.reef * POINTS.teleop.reef);
+
+                acc[entry.teamNumber].matchCount++;
+                acc[entry.teamNumber].totalAutoPoints += autoPoints;
+                acc[entry.teamNumber].totalTeleopPoints += teleopPoints;
+
+                // Check endgame success
+                if (entry.endgame !== 'None') {
+                    acc[entry.teamNumber].endgameAttempts++;
+                    // For this simple analysis, let's assume 'Climb', 'Climb with Alliance', and 'Trap' are successes
+                    if (entry.endgame === 'Climb' || entry.endgame === 'Climb with Alliance' || entry.endgame === 'Trap') {
+                        acc[entry.teamNumber].endgameSuccesses++;
+                    }
+                }
+
+                return acc;
+            }, {});
+
+            // Create table rows for each team
+            const teamNumbers = Object.keys(teams).sort((a, b) => a - b);
+            teamNumbers.forEach((teamNumber, index) => {
+                const teamData = teams[teamNumber];
+                const avgAutoPoints = (teamData.totalAutoPoints / teamData.matchCount).toFixed(2);
+                const avgTeleopPoints = (teamData.totalTeleopPoints / teamData.matchCount).toFixed(2);
+                const endgameSuccessRate = teamData.endgameAttempts > 0 ? ((teamData.endgameSuccesses / teamData.endgameAttempts) * 100).toFixed(1) : 0;
+
+                const row = document.createElement('tr');
+                row.className = index % 2 === 0 ? 'bg-slate-800 transition-colors duration-150' : 'bg-slate-700 transition-colors duration-150';
+                row.innerHTML = `
+                    <td class="px-6 py-4 text-sm font-medium text-white">${teamNumber}</td>
+                    <td class="px-6 py-4 text-sm text-gray-300">${teamData.matchCount}</td>
+                    <td class="px-6 py-4 text-sm text-gray-300">${avgAutoPoints}</td>
+                    <td class="px-6 py-4 text-sm text-gray-300">${avgTeleopPoints}</td>
+                    <td class="px-6 py-4 text-sm text-gray-300">${endgameSuccessRate}%</td>
+                `;
+                analysisTableBody.appendChild(row);
+            });
+        }
+
+        // Form submission handler
+        document.getElementById('scouting-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Collect form data
+            const formData = {
+                scoutName: document.getElementById('scout-name').value,
+                matchNumber: parseInt(document.getElementById('match-number').value),
+                teamNumber: parseInt(document.getElementById('team-number').value),
+                allianceColor: document.getElementById('alliance-color').value,
+                autoScoring: {
+                    coral: parseInt(document.getElementById('auto-coral').value),
+                    barge: parseInt(document.getElementById('auto-barge').value),
+                    mobility: document.getElementById('auto-mobility').checked
+                },
+                teleopScoring: {
+                    coral: parseInt(document.getElementById('teleop-coral').value),
+                    processor: parseInt(document.getElementById('teleop-processor').value),
+                    reef: parseInt(document.getElementById('teleop-reef').value)
+                },
+                endgame: document.getElementById('endgame-action').value,
+                defense: document.getElementById('defense').value,
+                comments: document.getElementById('comments').value,
+                timestamp: serverTimestamp() // Firestore timestamp
+            };
+
+            // Use exponential backoff for API call
+            const collectionRef = collection(db, `artifacts/${appId}/public/data/reefscape-scouting`);
+            let retryCount = 0;
+            const maxRetries = 5;
+            const delay = 1000;
+
+            const submitData = async () => {
+                try {
+                    await addDoc(collectionRef, formData);
+                    showMessage('Scouting data submitted successfully!');
+                    document.getElementById('scouting-form').reset(); // Reset the form
+                } catch (error) {
+                    if (error.code === 'unavailable' && retryCount < maxRetries) {
+                        retryCount++;
+                        setTimeout(submitData, delay * Math.pow(2, retryCount));
+                    } else {
+                        console.error("Error adding document:", error);
+                        showMessage("Failed to submit data. Check the console.", 'error');
+                    }
+                }
+            };
+            submitData();
+        });
+
+        // Toggle between raw data view and analysis view
+        document.getElementById('toggle-view-btn').addEventListener('click', () => {
+            const rawDataView = document.getElementById('raw-data-view');
+            const analysisView = document.getElementById('analysis-view');
+            const toggleButton = document.getElementById('toggle-view-btn');
+
+            if (rawDataView.classList.contains('hidden')) {
+                // Currently on analysis view, switch to raw data
+                rawDataView.classList.remove('hidden');
+                analysisView.classList.add('hidden');
+                toggleButton.textContent = 'Analyze Data';
+            } else {
+                // Currently on raw data view, switch to analysis
+                if (allScoutingData.length > 0) {
+                    runAnalysis(allScoutingData);
+                }
+                rawDataView.classList.add('hidden');
+                analysisView.classList.remove('hidden');
+                toggleButton.textContent = 'Raw Data';
+            }
+        });
+        
+        // Initialize Firebase on window load
+        window.onload = initializeFirebase;
+    </script>
+</body>
+</html>
